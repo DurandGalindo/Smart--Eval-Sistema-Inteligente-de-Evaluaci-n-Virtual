@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Examen - Sistema de Exámenes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 1rem;
+            position: relative;
+            color: #6c757d;
+            font-weight: bold;
+        }
+        .step.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .step.completed {
+            background-color: #198754;
+            color: white;
+        }
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 2rem;
+            height: 2px;
+            background-color: #e9ecef;
+            transform: translateY(-50%);
+        }
+        .step:last-child::after {
+            display: none;
+        }
+        .step.completed::after {
+            background-color: #198754;
+        }
+        .student-card {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .student-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .student-card.selected {
+            border-color: #0d6efd;
+            background-color: #f8f9ff;
+        }
+        .question-preview {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar text-white p-0">
+                <div class="p-3">
+                    <h5><i class="fas fa-file-alt me-2"></i>Generar Examen</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <small class="text-light">Docente:</small>
+                        <div id="teacherName" class="fw-bold"></div>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="teacher-dashboard.html" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                        <i class="fas fa-home me-2"></i>Dashboard
+                    </a>
+                    <a href="question-bank.html" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                        <i class="fas fa-question-circle me-2"></i>Banco de Preguntas
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action bg-transparent text-white border-0 active">
+                        <i class="fas fa-file-alt me-2"></i>Generar Examen
+                    </a>
+                    <hr class="border-light">
+                    <a href="#" onclick="logout()" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="p-4">
+                    <!-- Header -->
+                    <div class="mb-4">
+                        <h2>Generar Examen</h2>
+                        <p class="text-muted">Crea un nuevo examen usando plantillas predefinidas</p>
+                    </div>
+
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step active" id="step1">1</div>
+                        <div class="step" id="step2">2</div>
+                        <div class="step" id="step3">3</div>
+                        <div class="step" id="step4">4</div>
+                    </div>
+
+                    <!-- Step 1: Select Template -->
+                    <div id="examStep1" class="step-content">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-clipboard-list me-2"></i>Paso 1: Seleccionar Plantilla</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3" id="templatesList">
+                                    <!-- Templates will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Exam Details -->
+                    <div id="examStep2" class="step-content" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-info-circle me-2"></i>Paso 2: Detalles del Examen</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="examDetailsForm">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">ID del Examen</label>
+                                            <input type="text" class="form-control" id="examId" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Fecha del Examen</label>
+                                            <input type="date" class="form-control" id="examDate" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Plantilla Seleccionada</label>
+                                            <input type="text" class="form-control" id="selectedTemplate" readonly>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Select Students -->
+                    <div id="examStep3" class="step-content" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-users me-2"></i>Paso 3: Seleccionar Estudiantes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="studentSearch" placeholder="Buscar estudiante..." onkeyup="filterStudents()">
+                                </div>
+                                <div class="row g-3" id="studentsList">
+                                    <!-- Students will be loaded here -->
+                                </div>
+                                <div class="mt-3">
+                                    <small class="text-muted">Estudiantes seleccionados: <span id="selectedCount">0</span></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review and Generate -->
+                    <div id="examStep4" class="step-content" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-check-circle me-2"></i>Paso 4: Revisar y Generar</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="examSummary">
+                                    <!-- Exam summary will be generated here -->
+                                </div>
+                                <div id="questionsPreview" class="mt-4">
+                                    <!-- Questions preview will be shown here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-secondary" id="prevStep" onclick="previousStep()" style="display: none;">
+                            <i class="fas fa-arrow-left me-2"></i>Anterior
+                        </button>
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-primary" id="nextStep" onclick="nextStep()">
+                                Siguiente<i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                            <button type="button" class="btn btn-success" id="generateExam" onclick="generateExam()" style="display: none;">
+                                <i class="fas fa-magic me-2"></i>Generar Examen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/generate-exam.js"></script>
+</body>
+</html>
+

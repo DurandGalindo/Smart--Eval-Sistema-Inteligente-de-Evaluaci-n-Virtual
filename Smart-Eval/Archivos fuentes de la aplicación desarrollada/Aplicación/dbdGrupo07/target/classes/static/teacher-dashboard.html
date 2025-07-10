@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Docente - Sistema de Exámenes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: var(--primary-gradient) !important;
+            box-shadow: var(--card-shadow);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        .welcome-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #667eea;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+            border: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .icon-courses { background: var(--primary-gradient); }
+        .icon-templates { background: var(--secondary-gradient); }
+        .icon-questions { background: var(--success-gradient); }
+        .icon-exams { background: var(--warning-gradient); color: #333 !important; }
+
+        .btn-feature {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary { background: var(--primary-gradient); }
+        .btn-secondary { background: var(--secondary-gradient); }
+        .btn-success { background: var(--success-gradient); }
+        .btn-warning { background: var(--warning-gradient); color: #333; }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+
+        .modal-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .step.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 20px;
+            height: 2px;
+            background: #e9ecef;
+            transform: translateY(-50%);
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Sistema de Exámenes
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" id="teacherName">
+                    <i class="fas fa-user-circle me-2"></i>
+                </span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Salir
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <!-- Welcome Card -->
+        <div class="welcome-card">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="mb-2">¡Bienvenido, <span id="welcomeName"></span>!</h2>
+                    <p class="text-muted mb-0">Gestiona tus cursos, crea exámenes y evalúa a tus estudiantes desde este panel de control.</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <i class="fas fa-chalkboard-teacher fa-4x text-primary opacity-25"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalCourses">0</div>
+                    <div class="text-muted">Cursos</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalTemplates">0</div>
+                    <div class="text-muted">Plantillas</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalQuestions">0</div>
+                    <div class="text-muted">Preguntas</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalExams">0</div>
+                    <div class="text-muted">Exámenes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon icon-courses">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h5 class="mb-3">Gestionar Cursos</h5>
+                    <p class="text-muted mb-4">Crea y administra los cursos que impartes</p>
+                    <button class="btn btn-primary btn-feature" onclick="showManageCourses()">
+                        <i class="fas fa-cog me-2"></i>Gestionar
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon icon-templates">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h5 class="mb-3">Crear Plantillas</h5>
+                    <p class="text-muted mb-4">Define la estructura de tus exámenes</p>
+                    <button class="btn btn-secondary btn-feature" onclick="showCreateTemplate()">
+                        <i class="fas fa-plus me-2"></i>Crear
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon icon-questions">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h5 class="mb-3">Banco de Preguntas</h5>
+                    <p class="text-muted mb-4">Administra las preguntas de tus exámenes</p>
+                    <button class="btn btn-success btn-feature" onclick="showQuestionBank()">
+                        <i class="fas fa-database me-2"></i>Administrar
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon icon-exams">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h5 class="mb-3">Generar Exámenes</h5>
+                    <p class="text-muted mb-4">Crea exámenes para tus estudiantes</p>
+                    <button class="btn btn-warning btn-feature" onclick="showGenerateExam()">
+                        <i class="fas fa-magic me-2"></i>Generar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gestionar Cursos -->
+    <div class="modal fade" id="coursesModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-book me-2"></i>Gestionar Cursos
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Crear Nuevo Curso</h6>
+                            <form id="courseForm">
+                                <div class="mb-3">
+                                    <label for="courseId" class="form-label">ID del Curso</label>
+                                    <input type="text" class="form-control" id="courseId" placeholder="Ej: CUR00001" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="courseName" class="form-label">Nombre del Curso</label>
+                                    <input type="text" class="form-control" id="courseName" placeholder="Ej: Matemáticas Básicas" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Crear Curso
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Cursos Existentes</h6>
+                            <div id="coursesList" class="mt-3">
+                                <!-- Cursos se cargarán aquí -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Plantilla -->
+    <div class="modal fade" id="templateModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-clipboard-list me-2"></i>Crear Plantilla de Examen
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="step-indicator">
+                        <div class="step active" id="step1">1</div>
+                        <div class="step" id="step2">2</div>
+                        <div class="step" id="step3">3</div>
+                    </div>
+
+                    <!-- Paso 1: Información básica -->
+                    <div id="templateStep1">
+                        <h6 class="mb-4">Paso 1: Información Básica de la Plantilla</h6>
+                        <form id="templateBasicForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="templateId" class="form-label">ID de la Plantilla</label>
+                                        <input type="text" class="form-control" id="templateId" placeholder="Ej: PLT00001" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="templateCourse" class="form-label">Curso</label>
+                                        <select class="form-select" id="templateCourse" required>
+                                            <option value="">Selecciona un curso</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="templateDescription" class="form-label">Descripción de la Plantilla</label>
+                                <textarea class="form-control" id="templateDescription" rows="3" placeholder="Describe el propósito de esta plantilla..." required></textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Paso 2: Configuración de preguntas -->
+                    <div id="templateStep2" style="display: none;">
+                        <h6 class="mb-4">Paso 2: Configuración de Preguntas por Dificultad</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card border-success">
+                                    <div class="card-header bg-success text-white">
+                                        <i class="fas fa-smile me-2"></i>Preguntas Fáciles
+                                    </div>
+                                    <div class="card-body">
+                                        <input type="number" class="form-control form-control-lg text-center" id="easyQuestions" min="0" placeholder="0">
+                                        <small class="text-muted">Cantidad de preguntas fáciles</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-warning">
+                                    <div class="card-header bg-warning text-dark">
+                                        <i class="fas fa-meh me-2"></i>Preguntas Intermedias
+                                    </div>
+                                    <div class="card-body">
+                                        <input type="number" class="form-control form-control-lg text-center" id="mediumQuestions" min="0" placeholder="0">
+                                        <small class="text-muted">Cantidad de preguntas intermedias</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-danger">
+                                    <div class="card-header bg-danger text-white">
+                                        <i class="fas fa-frown me-2"></i>Preguntas Difíciles
+                                    </div>
+                                    <div class="card-body">
+                                        <input type="number" class="form-control form-control-lg text-center" id="hardQuestions" min="0" placeholder="0">
+                                        <small class="text-muted">Cantidad de preguntas difíciles</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Total de preguntas:</strong> <span id="totalQuestions">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Confirmación -->
+                    <div id="templateStep3" style="display: none;">
+                        <h6 class="mb-4">Paso 3: Confirmación</h6>
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>Resumen de la Plantilla:</h6>
+                                <div id="templateSummary">
+                                    <!-- Resumen se generará aquí -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="prevStep" onclick="previousStep()" style="display: none;">
+                        <i class="fas fa-arrow-left me-2"></i>Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextStep" onclick="nextStep()">
+                        Siguiente<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                    <button type="button" class="btn btn-success" id="createTemplate" onclick="createTemplate()" style="display: none;">
+                        <i class="fas fa-check me-2"></i>Crear Plantilla
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/teacher-dashboard.js"></script>
+</body>
+</html>

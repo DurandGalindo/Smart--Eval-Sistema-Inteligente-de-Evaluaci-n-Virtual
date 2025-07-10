@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco de Preguntas - Sistema de Exámenes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: var(--primary-gradient) !important;
+            box-shadow: var(--card-shadow);
+        }
+
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .question-card {
+            transition: transform 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .difficulty-badge {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .difficulty-easy { background: #d4edda; color: #155724; }
+        .difficulty-medium { background: #fff3cd; color: #856404; }
+        .difficulty-hard { background: #f8d7da; color: #721c24; }
+
+        .option-item {
+            background: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s;
+        }
+
+        .option-item.correct {
+            background-color: #d1edff;
+            border-color: #0d6efd;
+        }
+
+        .option-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary { background: var(--primary-gradient); border: none; }
+        .btn-success { background: var(--success-gradient); border: none; }
+
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+
+        .modal-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar text-white p-0">
+                <div class="p-3">
+                    <h5><i class="fas fa-question-circle me-2"></i>Banco de Preguntas</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <small class="text-light">Docente:</small>
+                        <div id="teacherName" class="fw-bold"></div>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="teacher-dashboard.html" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                        <i class="fas fa-home me-2"></i>Dashboard
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action bg-transparent text-white border-0 active">
+                        <i class="fas fa-question-circle me-2"></i>Banco de Preguntas
+                    </a>
+                    <a href="generate-exam.html" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                        <i class="fas fa-file-alt me-2"></i>Generar Examen
+                    </a>
+                    <hr class="border-light">
+                    <a href="#" onclick="logout()" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="p-4">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2>Banco de Preguntas</h2>
+                            <p class="text-muted">Gestiona las preguntas para tus exámenes</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="showCreateQuestion()">
+                            <i class="fas fa-plus me-2"></i>Nueva Pregunta
+                        </button>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Curso</label>
+                                    <select class="form-select" id="filterCourse" onchange="filterQuestions()">
+                                        <option value="">Todos los cursos</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Dificultad</label>
+                                    <select class="form-select" id="filterDifficulty" onchange="filterQuestions()">
+                                        <option value="">Todas las dificultades</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Tipo</label>
+                                    <select class="form-select" id="filterType" onchange="filterQuestions()">
+                                        <option value="">Todos los tipos</option>
+                                        <option value="VF">Verdadero/Falso</option>
+                                        <option value="SELECCION">Selección Múltiple</option>
+                                        <option value="RELLENAR">Rellenar</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Buscar</label>
+                                    <input type="text" class="form-control" id="searchText" placeholder="Buscar pregunta..." onkeyup="filterQuestions()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions List -->
+                    <div id="questionsList" class="row">
+                        <!-- Questions will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Question Modal -->
+    <div class="modal fade" id="questionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="questionModalTitle">Nueva Pregunta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="questionForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">ID Pregunta</label>
+                                <input type="text" class="form-control" id="questionId" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Puntaje Máximo</label>
+                                <input type="number" class="form-control" id="questionScore" min="1" max="20" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Curso</label>
+                                <select class="form-select" id="questionCourse" required>
+                                    <option value="">Selecciona un curso</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Dificultad</label>
+                                <select class="form-select" id="questionDifficulty" required>
+                                    <option value="">Selecciona dificultad</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Tipo de Pregunta</label>
+                                <select class="form-select" id="questionType" onchange="handleTypeChange()" required>
+                                    <option value="">Selecciona tipo</option>
+                                    <option value="VF">Verdadero/Falso</option>
+                                    <option value="SELECCION">Selección Múltiple</option>
+                                    <option value="RELLENAR">Rellenar</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Enunciado</label>
+                                <textarea class="form-control" id="questionText" rows="3" required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Options Section -->
+                        <div id="optionsSection" style="display: none;">
+                            <hr>
+                            <h6>Opciones de Respuesta</h6>
+                            <div id="optionsList">
+                                <!-- Options will be added here -->
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addOption()">
+                                <i class="fas fa-plus me-1"></i>Agregar Opción
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveQuestion()">Guardar Pregunta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Question Modal -->
+    <div class="modal fade" id="viewQuestionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalles de la Pregunta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="questionDetails">
+                    <!-- Question details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="editCurrentQuestion()">Editar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/question-bank.js"></script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Exámenes - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            margin: 2rem;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            background: var(--primary-gradient);
+            color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        }
+
+        .form-control {
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-login {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 15px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .role-card {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-card.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .role-card:hover {
+            border-color: #667eea;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            top: 20%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            bottom: 10%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <i class="fas fa-graduation-cap fa-3x shape"></i>
+        <i class="fas fa-book fa-2x shape"></i>
+        <i class="fas fa-pencil-alt fa-2x shape"></i>
+    </div>
+
+    <div class="login-container">
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h2 class="mb-0">SmartEval</h2>
+            <p class="text-muted">Sistema Inteligente de Evaluación Virtual</p>
+        </div>
+
+        <div class="role-selector">
+            <div class="role-card" onclick="selectRole('docente')" id="docenteCard">
+                <i class="fas fa-chalkboard-teacher fa-2x mb-2 text-primary"></i>
+                <h6>Docente</h6>
+            </div>
+            <div class="role-card" onclick="selectRole('estudiante')" id="estudianteCard">
+                <i class="fas fa-user-graduate fa-2x mb-2 text-success"></i>
+                <h6>Estudiante</h6>
+            </div>
+        </div>
+
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="userId" class="form-label">
+                    <i class="fas fa-user me-2"></i>ID de Usuario
+                </label>
+                <input type="text" class="form-control" id="userId" placeholder="Ingresa tu ID" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="userEmail" class="form-label">
+                    <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                </label>
+                <input type="email" class="form-control" id="userEmail" placeholder="Ingresa tu correo" required>
+            </div>
+
+            <button type="submit" class="btn btn-login">
+                <i class="fas fa-sign-in-alt me-2"></i>Ingresar al Sistema
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                <i class="fas fa-shield-alt me-1"></i>
+                Sistema seguro y confiable
+            </small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedRole = '';
+
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // Reset all cards
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Activate selected card
+            document.getElementById(role + 'Card').classList.add('active');
+            
+            // Update placeholder text
+            const userIdInput = document.getElementById('userId');
+            if (role === 'docente') {
+                userIdInput.placeholder = 'Ej: DOC00001';
+            } else {
+                userIdInput.placeholder = 'Ej: 23200000';
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!selectedRole) {
+                showAlert('Por favor selecciona tu rol', 'warning');
+                return;
+            }
+            
+            const userId = document.getElementById('userId').value;
+            const userEmail = document.getElementById('userEmail').value;
+            
+            try {
+                let endpoint = selectedRole === 'docente' ? '/api/docentes' : '/api/estudiantes';
+                const response = await fetch(endpoint);
+                const users = await response.json();
+                
+                const user = users.find(u => 
+                    (selectedRole === 'docente' ? u.idDocente : u.idEstudiante) === userId && 
+                    u.correo === userEmail
+                );
+                
+                if (user) {
+                    // Store user data
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
+                    sessionStorage.setItem('userRole', selectedRole);
+                    
+                    // Redirect based on role
+                    if (selectedRole === 'docente') {
+                        window.location.href = 'teacher-dashboard.html';
+                    } else {
+                        window.location.href = 'student-dashboard.html';
+                    }
+                } else {
+                    showAlert('Credenciales incorrectas', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error de conexión', 'danger');
+            }
+        });
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
