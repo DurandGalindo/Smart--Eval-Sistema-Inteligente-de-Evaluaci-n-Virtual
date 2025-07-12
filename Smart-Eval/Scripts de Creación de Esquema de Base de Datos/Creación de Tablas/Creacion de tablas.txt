@@ -1,0 +1,97 @@
+CREATE DATABASE BDDGRUPO07;
+USE  BDDGRUPO07;
+
+
+#TABLA N°1: ESTUDIANTE
+CREATE TABLE estudiante (
+  id_estudiante CHAR(8) PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  apellido VARCHAR(100) NOT NULL,
+  correo VARCHAR(250) UNIQUE NOT NULL
+);
+
+#Tabla N°2: CURSO
+CREATE TABLE curso (
+  id_curso CHAR(8) PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL
+);
+
+#TABLA N°3: DIFICULTAD
+CREATE TABLE dificultad (
+  id_dificultad CHAR(8) PRIMARY KEY,
+  descripcion_dificultad VARCHAR(50) NOT NULL
+);
+
+#TABLA N°4: PLANTILLA
+CREATE TABLE plantilla (
+  id_plantilla CHAR(8) PRIMARY KEY,
+  descripcion_plantilla VARCHAR(250) NOT NULL
+);
+
+#TABLA N°5: DOCENTE
+CREATE TABLE docente (
+	id_docente CHAR(8) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+	apellido VARCHAR(100) NOT NULL,
+	correo VARCHAR(150) UNIQUE NOT NULL,
+	especialidad VARCHAR(100),
+    telefono VARCHAR(20)
+);
+
+#TABLA N°6: DETALLE PLANTILLA
+CREATE TABLE detalle_plantilla (
+  id_detalle_plantilla CHAR(8) PRIMARY KEY,
+  id_plantilla CHAR(8) NOT NULL,
+  id_curso CHAR(8) NOT NULL,
+  cantidad_faciles INT NOT NULL,
+  cantidad_intermedias INT NOT NULL,
+  cantidad_dificiles INT NOT NULL
+);
+
+
+#TABLA N°7: PREGUNTA
+CREATE TABLE pregunta (
+  id_pregunta CHAR(8) PRIMARY KEY,
+  id_curso CHAR(8) NOT NULL,
+  id_dificultad CHAR(8) NOT NULL,
+  enunciado VARCHAR(300) NOT NULL,
+  tipo_pregunta ENUM('VF', 'SELECCION', 'RELLENAR'),
+  puntaje_maximo INT NOT NULL
+);
+
+#TABLA N°8: OPCION_RESPUESTA
+CREATE TABLE opcion_respuesta (
+  id_opcion_respuesta CHAR(8) PRIMARY KEY,
+  id_pregunta CHAR(8) NOT NULL,
+  texto_opcion VARCHAR(300) NOT NULL,
+  es_correcta BOOLEAN
+);
+
+#TABLA N°9:EXAMEN
+CREATE TABLE examen (
+  id_examen CHAR(8) PRIMARY KEY,
+  id_estudiante CHAR(8) NOT NULL,
+  id_plantilla CHAR(8) NOT NULL,
+  id_docente CHAR(8) NOT NULL,
+  fecha DATE NULL,
+  puntaje_final INT NULL,
+  estado ENUM('Pendiente', 'Terminado','Calificado') DEFAULT 'Pendiente'
+);
+
+#TABLA N°10: PREGUNTA_EXAMEN
+CREATE TABLE pregunta_examen (
+  id_examen CHAR(8) NOT NULL,
+  id_pregunta CHAR(8) NOT NULL,
+  PRIMARY KEY (id_examen, id_pregunta)
+);
+
+
+#TABLA N°11: RESPUESTA_ESTUDIANTE
+CREATE TABLE respuesta_estudiante (
+  id_respuesta_estudiante CHAR(8) PRIMARY KEY,
+  id_examen CHAR(8) NOT NULL,
+  id_pregunta CHAR(8) NOT NULL,
+  respuesta VARCHAR(250),
+  correcta BOOLEAN,
+  puntaje_obtenido INT NOT NULL
+);
